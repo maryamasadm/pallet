@@ -1,57 +1,59 @@
-
-
-
 from PIL import Image
 import cv2
 import numpy as np
 import os
 from ultralytics import YOLO
 import time
-import os
 import torch
+from ultralytics.utils.plotting import Annotator  # ultralytics.yolo.utils.plotting is deprecated
 
 
-if torch.backends.mps.is_available():
-    mps_device = torch.device("mps")
-    x = torch.ones(1, device=mps_device)
-    print (x)
-else:
-    print ("MPS device not found.")
-device = torch.device("mps")
+def ms_to_fps(milliseconds):
+    return 1000 / milliseconds
 
 
-# Load YOLO model
-model = YOLO("/Users/maryam/Downloads/best.pt")
-model.to(device)
-print('torch.cuda.device_count() = ', torch.cuda.device_count())
+def process_image(model_path, image_path):
+    if torch.backends.mps.is_available():
+        mps_device = torch.device("mps")
+        x = torch.ones(1, device=mps_device)
+        print(x)
+    else:
+        print("MPS device not found.")
 
-# Path to the folder containing images
-image_folder_path = "/Users/maryam/Desktop/Pallets.v2i.yolov8/test/images"
+    device = torch.device("mps")
 
-# List all image files in the folder
-image_files = [f for f in os.listdir(image_folder_path) if f.endswith(('.jpg', '.png', '.jpeg'))]
+    model = YOLO(model_path)
+    model.to(device)
+    print('torch.cuda.device_count() = ', torch.cuda.device_count())
 
-# Measure inference time for each image
-start_time = time.time()
-for image_file in image_files:
-    # Construct the full path to the image
-    image_path = os.path.join(image_folder_path, image_file)
+    # Check if the path is a directory or a single image
+    if os.path.isdir(image_path):
+        folder_path = image_path
+        image_files = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.png', '.jpeg'))]
+    elif os.path.isfile(image_path):
+        folder_path = os.path.dirname(image_path)
+        image_files = [os.path.basename(image_path)]
+    else:
+        print("Invalid path.")
+        return
 
-    # Perform inference on the image
-    #results = model.predict(source=image_path)
-    results = model.predict(source=image_path,imgsz=320, conf=0.5)
+    # going through the image folder and run the yolo for them
+    for image_file in image_files:
+        image_path = os.path.join(folder_path, image_file)
+        results = model.predict(source=image_path, imgsz=640, conf=0.9,  save=True)
+
+    # compute the FPS inference
+    inference_time_ms = results[0].speed['inference']  # taken from your YOLO result
+    fps = ms_to_fps(inference_time_ms)
+    print(f"Inference FPS: {fps:.2f}")
     
-    #results = model(source=image_path)  # predict on an image
-
-# Calculate total time and FPS
-end_time = time.time()
-total_time = end_time - start_time
-total_images = len(image_files)
-fps = total_images / total_time
-
-print(f"Total time: {total_time:.2f} seconds")
-print(f"Total images: {total_images}")
-print(f"Frames per second (FPS): {fps:.2f}")
-
-# Export the model
-#model.export(format='onnx')
+    # If a single image is processed, display the result
+    if len(image_files) == 1:
+        for r in results:
+            im_array = r.plot()  # plot a BGR numpy array of predictions
+            im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
+            img = cv2.cvtColor(im_array[..., ::-1], cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+            cv2.imshow('Result', img)  # Display the image using OpenCV
+            cv2.waitKey(0)  # Wait for a key press to close the image window
+            cv2.destroyAllWindows()  # Close all OpenCV windows  
+       
