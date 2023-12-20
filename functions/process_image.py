@@ -53,7 +53,15 @@ def process_image(model_path, image_path):
             im_array = r.plot()  # plot a BGR numpy array of predictions
             im = Image.fromarray(im_array[..., ::-1])  # RGB PIL image
             img = cv2.cvtColor(im_array[..., ::-1], cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
-            cv2.imshow('Result', img)  # Display the image using OpenCV
+            # Load the original image
+            original_img = cv2.imread(image_path)
+            # Resize the original image to match the dimensions of the predicted image
+            original_img = cv2.resize(original_img, (im_array.shape[1], im_array.shape[0]))
+
+            # Concatenate the original and predicted images horizontally
+            concatenated_img = np.hstack((original_img, im_array))
+
+            # Display the concatenated image using OpenCV
+            cv2.imshow('Original vs Predicted', concatenated_img)
             cv2.waitKey(0)  # Wait for a key press to close the image window
-            cv2.destroyAllWindows()  # Close all OpenCV windows  
-       
+            cv2.destroyAllWindows()  # Close all OpenCV windows

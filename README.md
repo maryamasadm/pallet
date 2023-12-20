@@ -3,8 +3,8 @@
 This repository develop a prototype model for real-time detection of wooden pallets based on Yolov8.
 
 
-<img src="/image.jpg" alt="wooden pallet" width="70%">
-<div style="text-align:center;font-style:italic;font-size:80%">Ref</div>
+<img src="/image.png" alt="wooden pallet" width="70%">
+
 
 
 ## Local Installation
