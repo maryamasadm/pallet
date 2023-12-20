@@ -2,11 +2,9 @@
 
 This repository develop a prototype model for real-time detection of wooden pallets based on Yolov8.
 
-<a href="https://lens.monash.edu/@technology/2020/06/22/1380700/mirror-ritual-ais-role-in-reframing-viewers-emotions" style="text-decoration:none">
-  <img src="/image.jpg" alt="wooden pallet" width="50%">
-  <div style="text-align:center;font-style:italic;font-size:80%">Ref</div>
-</a>
 
+<img src="/image.jpg" alt="wooden pallet" width="70%">
+<div style="text-align:center;font-style:italic;font-size:80%">Ref</div>
 
 
 ## Local Installation
@@ -24,6 +22,16 @@ To set up the Conda environment required for running the code locally on your ma
     python main.py path/to/your/image
 
 ```
+### usage
+
+Run this and change give the folder path:
+
+```bash
+python main.py folder_path
+
+```
+
+
 **Libraries and Frameworks:**
 
 - [YOLOv8](https://docs.ultralytics.com/): Used for object detection.
