@@ -19,8 +19,7 @@ To set up the Conda environment required for running the code locally on your ma
     conda create --name pallet
     conda activate pallet
     pip install -r requirements.txt
-    python main.py path/to/your/image
-
+   
 ```
 ### usage
 
