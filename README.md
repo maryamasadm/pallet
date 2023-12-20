@@ -27,7 +27,7 @@ To set up the Conda environment required for running the code locally on your ma
 Run this and change give the folder path or image path:
 
 ```bash
-python main.py folder_path
+python main.py folder_path_or_image_path
 
 ```
 
